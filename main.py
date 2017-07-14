@@ -9,6 +9,7 @@ from logging import log
 BUCKET = 'tada-backup-falcao'
 DATABASE_URI = 'postgresql+psycopg2://postgres:1@192.168.0.101:5432/falcao'
 FILENAME = 'falcao.backup'
+AGENDAR = False
 MINUTES = 2
 
 
@@ -67,13 +68,17 @@ def backup_on_s3():
 
 def schedule_backup(minutes):
     "Agenda rotina"
+    print('Agendando tarefa...')
     s = sched.scheduler()
     s.enter(minutes*60, 1, backup_on_s3)
     s.run()
 
 
 def main():
-    schedule_backup(MINUTES)
+    if AGENDAR:
+        schedule_backup(MINUTES)
+    else:
+        backup_on_s3()
 
 
 if __name__ == '__main__':
