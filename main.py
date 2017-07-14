@@ -22,7 +22,10 @@ def dump_db():
         s = DATABASE_URI
         user, password = re.search('//(.*)@', s).group(1).split(':')
         host, db = re.search('@(.*)', s).group(1).split('/')
-        host, porta = host.split(':')
+        try:
+            host, porta = host.split(':')
+        except:
+            porta = '5432'
 
         # Define a variavel de ambiente com a senha para o pg_dump.
         arq_backup = FILENAME
