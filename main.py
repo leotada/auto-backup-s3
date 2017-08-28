@@ -6,14 +6,14 @@ import sched, time
 import base64
 from logging import log
 
-
+# configurar
 BUCKET = 'tada-backup-falcao'
-DATABASE_URI = base64.b64decode(b'cG9zdGdyZXNxbCtwc3ljb3BnMjovL3Bvc3RncmVzOjFAbG9jYWxob3N0OjU0MzIvZmFsY2Fv')
-FILENAME = 'falcao.backup'
+DATABASE_URI = base64.b64decode(b'postgresql+psycopg2://postgres:1@localhost:5432/banco').decode()
+FILENAME = 'nome.backup'
 AGENDAR = True
-MINUTES = 5
-ACCESS_KEY_ID = ''
-ACCESS_KEY = ''
+MINUTES = 0.1
+ACCESS_KEY_ID = base64.b64decode(b'bla').decode()
+ACCESS_KEY = base64.b64decode(b'bla').decode()
 
 
 def dump_db():
