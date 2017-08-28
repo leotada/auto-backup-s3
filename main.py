@@ -1,16 +1,19 @@
 import boto3
 import lzma
 import re
-import os
 import subprocess
 import sched, time
+import base64
 from logging import log
 
+
 BUCKET = 'tada-backup-falcao'
-DATABASE_URI = 'postgresql+psycopg2://postgres:1@192.168.0.101:5432/falcao'
+DATABASE_URI = base64.b64decode(b'cG9zdGdyZXNxbCtwc3ljb3BnMjovL3Bvc3RncmVzOjFAbG9jYWxob3N0OjU0MzIvZmFsY2Fv')
 FILENAME = 'falcao.backup'
-AGENDAR = False
-MINUTES = 2
+AGENDAR = True
+MINUTES = 5
+ACCESS_KEY_ID = ''
+ACCESS_KEY = ''
 
 
 def dump_db():
@@ -27,16 +30,10 @@ def dump_db():
         except:
             porta = '5432'
 
-        # Define a variavel de ambiente com a senha para o pg_dump.
         arq_backup = FILENAME
-        if password != '':
-            # Linux
-            if os.name == 'posix':
-                os.system('PGPASSWORD="{}"'.format(password))
-            # Windows TODOS
-            else:
-                os.system('SET PGPASSWORD="{}"'.format(password))
-        r = subprocess.check_call(['pg_dump', '-d', db, '-h', host, '-p', porta, '-U', user, '-f', arq_backup, '-F', 't', '-w'])
+        r = subprocess.check_call(['pg_dump',
+                                   f'--dbname=postgresql://{user}:{password}@{host}:{porta}/{db}',
+                                   '-f', arq_backup, '-F', 't', '-w'])
     except Exception as e:
             log.exception('admin, _backup. Erro pg_dump: {}.'.format(e))
     return r == 0
@@ -50,7 +47,9 @@ def compress_file(input_name, output_name):
 
 
 def upload_file(filename):
-    s3 = boto3.client('s3')
+    s3 = boto3.client('s3',
+                      aws_access_key_id=ACCESS_KEY_ID,
+                      aws_secret_access_key=ACCESS_KEY)
     bucket_name = BUCKET
     s3.upload_file(filename, bucket_name, filename)
 
