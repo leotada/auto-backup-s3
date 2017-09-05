@@ -31,9 +31,9 @@ def dump_db():
             porta = '5432'
 
         arq_backup = FILENAME
-        r = subprocess.check_call(['pg_dump',
+        r = subprocess.run(' '.join(['pg_dump',
                                    f'--dbname=postgresql://{user}:{password}@{host}:{porta}/{db}',
-                                   '-f', arq_backup, '-F', 't', '-w'])
+                                   '-f', arq_backup, '-F', 't', '-w']), check=True, shell=True)
     except Exception as e:
             log.exception('admin, _backup. Erro pg_dump: {}.'.format(e))
     return r == 0
