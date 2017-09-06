@@ -5,15 +5,26 @@ import subprocess
 import sched, time
 import base64
 from logging import log
+import os
 
 # configurar
 BUCKET = 'tada-backup-falcao'
-DATABASE_URI = base64.b64decode(b'postgresql+psycopg2://postgres:1@localhost:5432/banco').decode()
-FILENAME = 'nome.backup'
+DATABASE_URI = base64.b64decode(b'bla').decode()
+FILENAME = 'bla.backup'  # Mudar
 AGENDAR = True
-MINUTES = 0.1
+MINUTES = 6
 ACCESS_KEY_ID = base64.b64decode(b'bla').decode()
 ACCESS_KEY = base64.b64decode(b'bla').decode()
+
+
+def runprocess(command):
+    "Executa subprocess multiplataforma sem exibir janela. Retorna o returncode."
+    startupinfo = None
+    if os.name == 'nt':
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    retcode = subprocess.check_call(command, timeout=30, startupinfo=startupinfo)
+    return retcode
 
 
 def dump_db():
@@ -31,9 +42,9 @@ def dump_db():
             porta = '5432'
 
         arq_backup = FILENAME
-        r = subprocess.run(' '.join(['pg_dump',
-                                   f'--dbname=postgresql://{user}:{password}@{host}:{porta}/{db}',
-                                   '-f', arq_backup, '-F', 't', '-w']), check=True, shell=True)
+        r = runprocess(['pg_dump',
+                       f'--dbname=postgresql://{user}:{password}@{host}:{porta}/{db}',
+                       '-f', arq_backup, '-F', 't', '-w'])
     except Exception as e:
             log.exception('admin, _backup. Erro pg_dump: {}.'.format(e))
     return r == 0
